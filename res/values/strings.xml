@@ -2,4 +2,5 @@
 <resources>
     <string name="app_name">Graphics Sandbox</string>
     <string name="sample1_label">Rotating Circle</string>
+    <string name="sample2_label">Example 2</string>
 </resources>

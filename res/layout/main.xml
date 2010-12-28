@@ -2,12 +2,18 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
               android:orientation="vertical"
               android:layout_width="fill_parent"
-              android:layout_height="fill_parent"
-              android:padding="10dp">
+              android:layout_height="fill_parent">
     <Button android:layout_width="fill_parent"
             android:layout_height="wrap_content"
             android:id="@+id/sample1_button"
             android:text="@string/sample1_label"
+            android:layout_margin="10dp"
+            android:onClick="onButtonClick" />
+    <Button android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/sample2_button"
+            android:text="@string/sample2_label"
+            android:layout_margin="10dp"
             android:onClick="onButtonClick" />
 </LinearLayout>
 
