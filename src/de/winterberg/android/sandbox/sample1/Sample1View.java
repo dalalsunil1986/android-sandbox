@@ -1,10 +1,7 @@
 package de.winterberg.android.sandbox.sample1;
 
 import android.content.Context;
-import android.graphics.Canvas;
-import android.graphics.Color;
-import android.graphics.Paint;
-import android.graphics.Path;
+import android.graphics.*;
 import android.view.View;
 
 /**
@@ -20,17 +17,38 @@ public class Sample1View extends View {
 
     @Override
     protected void onDraw(Canvas canvas) {
-        Paint circlePaint = new Paint();
-        circlePaint.setColor(Color.LTGRAY);
+        int circleHeight = 150;
+        int circleWidth = 150;
 
-        Paint textPaint = new Paint();
-        textPaint.setTextSize(20f);
-        textPaint.setColor(Color.BLACK);
+        Paint glow = new Paint();
+        glow.setShadowLayer(40, 0, 0, Color.argb(200, 255, 0, 0));
+
+        Path glowCircle = new Path();
+        glowCircle.addCircle(circleWidth, circleHeight, 100, Path.Direction.CW);
+        canvas.drawPath(glowCircle, glow);
+
+
+
+        Paint cPaint = new Paint();
+        cPaint.setAntiAlias(true);
+        cPaint.setDither(true);
+
+        int color1 = Color.rgb(60, 60, 60);
+        int color2 = Color.rgb(200, 200, 200);
+        LinearGradient gradient = new LinearGradient(0, 0, 0, circleHeight*2, color1, color2, Shader.TileMode.REPEAT);
+        cPaint.setShader(gradient);
+
+
+        Paint tPaint = new Paint();
+        tPaint.setTextSize(18f);
+        tPaint.setTypeface(Typeface.DEFAULT_BOLD);
+        tPaint.setColor(Color.BLACK);
+        tPaint.setAntiAlias(true);
 
         Path circle = new Path();
-        circle.addCircle(150, 150, 100, Path.Direction.CW);
+        circle.addCircle(circleWidth, circleHeight, 100, Path.Direction.CW);
 
-        canvas.drawPath(circle, circlePaint);
-        canvas.drawTextOnPath(QUOTE, circle, 0, 20, textPaint);
+        canvas.drawPath(circle, cPaint);
+        canvas.drawTextOnPath(QUOTE, circle, 0, 20, tPaint);
     }
 }

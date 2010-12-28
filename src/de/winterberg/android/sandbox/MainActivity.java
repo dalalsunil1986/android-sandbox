@@ -16,6 +16,7 @@ public class MainActivity extends Activity {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.main);
+        startSample(1);
     }
 
     public void onButtonClick(View view) {
