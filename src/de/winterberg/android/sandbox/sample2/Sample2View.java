@@ -15,7 +15,6 @@ public class Sample2View extends View {
     private static final float STROKE_WIDTH = 5;
     private static final float CIRCLE_RADIUS = 30;
 
-
     public Sample2View(Context context) {
         super(context);
     }
@@ -32,8 +31,8 @@ public class Sample2View extends View {
         paint.setStyle(Paint.Style.STROKE);
         paint.setStrokeWidth(STROKE_WIDTH);
 
-        float x = 150;
-        float y = 150;
+        float x = canvas.getWidth() / 2f;
+        float y = canvas.getHeight() - MARGIN - STROKE_WIDTH - CIRCLE_RADIUS;
 
         Path circle = new Path();
         circle.addCircle(x, y, CIRCLE_RADIUS, Path.Direction.CW);
