@@ -65,6 +65,8 @@ public class BallView extends View {
         Log.d(TAG, "fromYDelta=" + fromYDelta + "; toYDelta=" + toYDelta
                 + "; fromXDelta=" + fromXDelta + "; toXDelta=" + toXDelta);
 
+
+
         final TranslateAnimation animation = createAnimation(fromXDelta, toXDelta, fromYDelta, toYDelta);
         animation.setAnimationListener(new AnimationListenerAdapter() {
             @Override
@@ -128,8 +130,13 @@ public class BallView extends View {
     }
 
     private TranslateAnimation createAnimation(float fromXDelta, float toXDelta, float fromYDelta, float toYDelta) {
+
+        double distance = Math.sqrt((double) toXDelta * toXDelta + toYDelta * toYDelta);
+
+        long duration = (long)((distance / DISTANCE_PER_SECOND) * 1000f);
+
         TranslateAnimation animation = new TranslateAnimation(fromXDelta, toXDelta, fromYDelta, toYDelta);
-        animation.setDuration(1500);
+        animation.setDuration(duration);
         animation.setFillAfter(true);
         animation.setInterpolator(new LinearInterpolator());
         return animation;

@@ -12,4 +12,7 @@ public final class Constants {
     public static final float MARGIN = 5;
     public static final float STROKE_WIDTH = 5;
     public static final float CIRCLE_RADIUS = 20;
+
+    public static final float DISTANCE_PER_SECOND = 300f;
+
 }
