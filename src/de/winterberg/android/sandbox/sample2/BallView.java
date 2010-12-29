@@ -20,6 +20,11 @@ import static de.winterberg.android.sandbox.sample2.Constants.*;
 public class BallView extends View {
     private static final String TAG = "Sample2";
 
+    private static final int LEFT = 0;
+    private static final int RIGHT = 1;
+    private static final int TOP = 2;
+    private static final int BOTTOM = 3;
+
     private static final Random RANDOM = new Random();
 
     private boolean initialized = false;
@@ -27,9 +32,6 @@ public class BallView extends View {
     private RectF bounds;
 
     private PointF position;
-
-    private PointF nextPosition;
-
 
     public BallView(Context context, AttributeSet attrs) {
         super(context, attrs);
@@ -43,38 +45,17 @@ public class BallView extends View {
         float bottom = canvas.getHeight() - MARGIN - STROKE_WIDTH - CIRCLE_RADIUS;
         bounds = new RectF(left, top, right, bottom);
 
-        // setup starting position
         doAnimate(canvas);
-
-        // done
         initialized = true;
     }
 
     private void doAnimate(Canvas canvas) {
-        position = new PointF(canvas.getWidth() / 2f, bounds.bottom);
-        nextPosition = new PointF(canvas.getWidth() / 2f, bounds.top);
-        doAnimate(position, nextPosition);
+        PointF start = new PointF(canvas.getWidth() / 2f, bounds.bottom);
+        doAnimate(start, nextRandomPosition(start));
     }
-
-//    private PointF position(float x, float y) {
-//        float xx = x;
-//        if (x == bounds.left)
-//            xx += CIRCLE_RADIUS;
-//        if (x == bounds.right)
-//            xx -= CIRCLE_RADIUS;
-//
-//        float yy = y;
-//        if (y == bounds.top)
-//            yy += CIRCLE_RADIUS;
-//        if (y == bounds.bottom)
-//            yy -= CIRCLE_RADIUS;
-//
-//        return new PointF(xx, yy);
-//    }
 
     private void doAnimate(final PointF from, final PointF to) {
         position = from;
-        nextPosition = to;
 
         float toXDelta = to.x - from.x;
         float toYDelta = to.y - from.y;
@@ -89,7 +70,6 @@ public class BallView extends View {
             @Override
             public void onAnimationEnd(Animation animation) {
                 position = to;
-                nextPosition = null;
                 doAnimate(position, nextRandomPosition(position));
             }
         });
@@ -97,21 +77,59 @@ public class BallView extends View {
     }
 
     private PointF nextRandomPosition(PointF position) {
-        int xBounds = (int) (bounds.right - bounds.left);
-        float x = RANDOM.nextInt(xBounds) + bounds.left;
+        float x, y = .0f;
 
-        float y;
-        if (position.y <= bounds.top)
-            y = bounds.bottom;
-        else
-            y = bounds.top;
+        int xBounds = (int) (bounds.right - bounds.left);
+        int yBounds = (int) (bounds.bottom - bounds.top);
+
+        int direction = nextRandomDirection(position);
+        switch (direction) {
+            case LEFT:
+                x = bounds.left;
+                y = RANDOM.nextInt(yBounds) + bounds.top;
+                break;
+            case RIGHT:
+                x = bounds.right;
+                y = RANDOM.nextInt(yBounds) + bounds.top;
+                break;
+            case TOP:
+                x = RANDOM.nextInt(xBounds) + bounds.left;
+                y = bounds.top;
+                break;
+            case BOTTOM:
+                x = RANDOM.nextInt(xBounds) + bounds.left;
+                y = bounds.bottom;
+                break;
+            default:
+                throw new IllegalStateException("Unknown direction: " + direction);
+        }
 
         return new PointF(x, y);
     }
 
+    private int nextRandomDirection(PointF position) {
+        int direction = RANDOM.nextInt(4);
+        if (direction == getDirection(position))
+            return (direction + 1) % 4;
+        return direction;
+    }
+
+    private int getDirection(PointF position) {
+        if (position.y == bounds.bottom)
+            return BOTTOM;
+        if (position.y == bounds.top)
+            return TOP;
+        if (position.x == bounds.left)
+            return LEFT;
+        if (position.x == bounds.right)
+            return RIGHT;
+
+        throw new IllegalStateException("Position does not intersect bounds: " + position);
+    }
+
     private TranslateAnimation createAnimation(float fromXDelta, float toXDelta, float fromYDelta, float toYDelta) {
         TranslateAnimation animation = new TranslateAnimation(fromXDelta, toXDelta, fromYDelta, toYDelta);
-        animation.setDuration(1000);
+        animation.setDuration(1500);
         animation.setFillAfter(true);
         animation.setInterpolator(new LinearInterpolator());
         return animation;
