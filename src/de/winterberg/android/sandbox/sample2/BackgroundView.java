@@ -21,7 +21,7 @@ public class BackgroundView extends View {
 
     @Override
     protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
-        setMeasuredDimension(10000, 10000);
+        setMeasuredDimension(10000, 10000);     // maximize
     }
 
     @Override

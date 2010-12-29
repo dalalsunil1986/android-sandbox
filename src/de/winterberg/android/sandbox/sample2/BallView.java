@@ -1,10 +1,9 @@
 package de.winterberg.android.sandbox.sample2;
 
 import android.content.Context;
-import android.graphics.Canvas;
-import android.graphics.Paint;
-import android.graphics.Path;
+import android.graphics.*;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.View;
 import android.view.animation.TranslateAnimation;
 
@@ -14,39 +13,63 @@ import static de.winterberg.android.sandbox.sample2.Constants.*;
  * @author Benjamin Winterberg
  */
 public class BallView extends View {
+    private static final String TAG = "Sample2";
 
-    private TranslateAnimation animation;
-
+//    private TranslateAnimation animation;
+//
 //    private PointF start;
 //    private PointF end;
 
+    private RectF bounds;
+
+    private PointF position;
+
+    private boolean initialized = false;
 
     public BallView(Context context, AttributeSet attrs) {
         super(context, attrs);
     }
 
-    private void setUpAnimation(Canvas canvas) {
-//        if (start == null)
-//            start = new PointF(canvas.getWidth() / 2f, canvas.getHeight() - MARGIN - STROKE_WIDTH - CIRCLE_RADIUS);
-//
-//        if (end == null)
-//            end = new PointF(canvas.getWidth() / 2f, MARGIN + STROKE_WIDTH + CIRCLE_RADIUS);
+    private void initialize(Canvas canvas) {
+        // calculate inner bounds
+        float left = MARGIN + STROKE_WIDTH;
+        float top = MARGIN + STROKE_WIDTH;
+        float right = canvas.getWidth() - MARGIN - STROKE_WIDTH;
+        float bottom = canvas.getHeight() - MARGIN - STROKE_WIDTH;
+        bounds = new RectF(left, top, right, bottom);
 
-        animation = new TranslateAnimation(0, 0, 0, -250);
-        animation.setDuration(5000);
-        setAnimation(animation);
+        // setup starting position
+        position = new PointF(canvas.getWidth() / 2f, bottom - CIRCLE_RADIUS);
+
+        // ready for take off
+        doAnimate(position, new PointF(canvas.getWidth() / 2f, top + CIRCLE_RADIUS));
+
+        // done
+        initialized = true;
+    }
+
+    private void doAnimate(PointF from, PointF to) {
+        float toYDelta = to.y - from.y;
+        float fromYDelta = 0;
+        float toXDelta = to.x - from.x;
+        float fromXDelta = 0;
+        Log.d(TAG, "Starting animation: fromYDelta=" + fromYDelta + "; toYDelta=" + toYDelta + "; fromXDelta="
+                + fromXDelta + "; toXDelta=" + toXDelta);
+        TranslateAnimation animation = new TranslateAnimation(fromXDelta, toXDelta, fromYDelta, toYDelta);
+        animation.setDuration(2500);
+        animation.setFillAfter(true);
         startAnimation(animation);
     }
 
     @Override
     protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
-        setMeasuredDimension(10000, 10000);
+        setMeasuredDimension(10000, 10000);     // maximize
     }
 
     @Override
     protected void onDraw(Canvas canvas) {
-        if (animation == null)
-            setUpAnimation(canvas);
+        if (!initialized)
+            initialize(canvas);
 
         drawCircle(canvas);
     }
@@ -57,11 +80,8 @@ public class BallView extends View {
         paint.setStyle(Paint.Style.STROKE);
         paint.setStrokeWidth(STROKE_WIDTH);
 
-        float x = canvas.getWidth() / 2f;
-        float y = canvas.getHeight() - MARGIN - STROKE_WIDTH - CIRCLE_RADIUS;
-
         Path circle = new Path();
-        circle.addCircle(x, y, CIRCLE_RADIUS, Path.Direction.CW);
+        circle.addCircle(position.x, position.y, CIRCLE_RADIUS, Path.Direction.CW);
         canvas.drawPath(circle, paint);
     }
 
