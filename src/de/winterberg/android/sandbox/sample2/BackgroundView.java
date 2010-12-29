@@ -5,6 +5,7 @@ import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.graphics.Rect;
 import android.graphics.RectF;
+import android.util.AttributeSet;
 import android.view.View;
 
 import static de.winterberg.android.sandbox.sample2.Constants.*;
@@ -14,8 +15,13 @@ import static de.winterberg.android.sandbox.sample2.Constants.*;
  */
 public class BackgroundView extends View {
 
-    public BackgroundView(Context context) {
-        super(context);
+    public BackgroundView(Context context, AttributeSet attrs) {
+        super(context, attrs);
+    }
+
+    @Override
+    protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
+        setMeasuredDimension(10000, 10000);
     }
 
     @Override

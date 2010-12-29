@@ -4,7 +4,7 @@ import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.graphics.Path;
-import android.graphics.PointF;
+import android.util.AttributeSet;
 import android.view.View;
 import android.view.animation.TranslateAnimation;
 
@@ -13,29 +13,34 @@ import static de.winterberg.android.sandbox.sample2.Constants.*;
 /**
  * @author Benjamin Winterberg
  */
-public class ForegroundView extends View {
+public class BallView extends View {
 
     private TranslateAnimation animation;
 
-    private PointF start;
-    private PointF end;
+//    private PointF start;
+//    private PointF end;
 
 
-    public ForegroundView(Context context) {
-        super(context);
+    public BallView(Context context, AttributeSet attrs) {
+        super(context, attrs);
     }
 
     private void setUpAnimation(Canvas canvas) {
-        if (start == null)
-            start = new PointF(canvas.getWidth() / 2f, canvas.getHeight() - MARGIN - STROKE_WIDTH - CIRCLE_RADIUS);
-
-        if (end == null)
-            end = new PointF(canvas.getWidth() / 2f, MARGIN + STROKE_WIDTH + CIRCLE_RADIUS);
+//        if (start == null)
+//            start = new PointF(canvas.getWidth() / 2f, canvas.getHeight() - MARGIN - STROKE_WIDTH - CIRCLE_RADIUS);
+//
+//        if (end == null)
+//            end = new PointF(canvas.getWidth() / 2f, MARGIN + STROKE_WIDTH + CIRCLE_RADIUS);
 
         animation = new TranslateAnimation(0, 0, 0, -250);
         animation.setDuration(5000);
         setAnimation(animation);
         startAnimation(animation);
+    }
+
+    @Override
+    protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
+        setMeasuredDimension(10000, 10000);
     }
 
     @Override
