@@ -3,4 +3,5 @@
     <string name="app_name">Graphics Sandbox</string>
     <string name="sample1_label">Rotating Circle</string>
     <string name="sample2_label">Bouncing Ball</string>
+    <string name="sample3_label">Evading Ball</string>
 </resources>

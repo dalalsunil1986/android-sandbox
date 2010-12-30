@@ -15,5 +15,11 @@
             android:text="@string/sample2_label"
             android:layout_margin="10dp"
             android:onClick="onButtonClick" />
+    <Button android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/sample3_button"
+            android:text="@string/sample3_label"
+            android:layout_margin="10dp"
+            android:onClick="onButtonClick" />
 </LinearLayout>
 
