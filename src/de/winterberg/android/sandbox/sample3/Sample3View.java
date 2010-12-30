@@ -10,8 +10,38 @@ import android.view.SurfaceView;
  */
 public class Sample3View extends SurfaceView implements SurfaceHolder.Callback {
 
+
+    class SurfaceThread extends Thread {
+        private Context context;
+        private SurfaceHolder surfaceHolder;
+
+        SurfaceThread(Context context, SurfaceHolder surfaceHolder) {
+            super();
+            this.context = context;
+            this.surfaceHolder = surfaceHolder;
+        }
+
+        @Override
+        public void run() {
+            // TODO
+        }
+    }
+
+
+
+    private Context context;
+
+    private SurfaceThread thread;
+
+
     public Sample3View(Context context, AttributeSet attrs) {
         super(context, attrs);
+
+        SurfaceHolder holder = getHolder();
+        holder.addCallback(this);
+
+        this.context = context;
+        this.thread = new SurfaceThread(context, holder);
     }
 
     public void surfaceCreated(SurfaceHolder surfaceHolder) {
