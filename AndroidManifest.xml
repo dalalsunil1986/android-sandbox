@@ -18,5 +18,6 @@
         <activity android:name=".sample2.Sample2Activity"
                   android:label="@string/sample2_label"
                   android:theme="@android:style/Theme.Black.NoTitleBar.Fullscreen" />
+        <activity android:name=".sample3.Sample3Activity" />
     </application>
 </manifest>
