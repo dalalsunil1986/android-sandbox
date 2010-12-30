@@ -1,7 +1,9 @@
 package de.winterberg.android.sandbox.sample3;
 
 import android.content.Context;
+import android.graphics.*;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 
@@ -10,10 +12,25 @@ import android.view.SurfaceView;
  */
 public class Sample3View extends SurfaceView implements SurfaceHolder.Callback {
 
+    private static final String TAG = "Sample3";
+
+    public static final int GREEN = Color.rgb(22, 245, 156);
+    public static final int BLUE = Color.rgb(22, 167, 245);
+
+    public static final float MARGIN = 5;
+    public static final float STROKE_WIDTH = 5;
+    public static final float CIRCLE_RADIUS = 20;
+
 
     class SurfaceThread extends Thread {
-        private Context context;
-        private SurfaceHolder surfaceHolder;
+        private final Context context;
+        private final SurfaceHolder surfaceHolder;
+
+        private boolean running = false;
+
+        private int surfaceWidth;
+        private int surfaceHeight;
+
 
         SurfaceThread(Context context, SurfaceHolder surfaceHolder) {
             super();
@@ -23,10 +40,53 @@ public class Sample3View extends SurfaceView implements SurfaceHolder.Callback {
 
         @Override
         public void run() {
+            Log.d(TAG, "surface thread running");
+            while (running) {
+                Canvas canvas = null;
+                try {
+                    canvas = surfaceHolder.lockCanvas();
+                    synchronized (surfaceHolder) {
+                        updatePhysics();
+                        doDraw(canvas);
+                    }
+                } finally {
+                    if (canvas != null)
+                        surfaceHolder.unlockCanvasAndPost(canvas);
+                }
+            }
+            Log.d(TAG, "surface thread stopped");
+        }
+
+        private void updatePhysics() {
             // TODO
         }
-    }
 
+        private void doDraw(Canvas canvas) {
+            drawBackground(canvas);
+        }
+
+        private void drawBackground(Canvas canvas) {
+            Paint paint = new Paint(Paint.ANTI_ALIAS_FLAG);
+            paint.setColor(BLUE);
+            paint.setStyle(Paint.Style.STROKE);
+            paint.setStrokeWidth(STROKE_WIDTH);
+
+            Rect bounds = canvas.getClipBounds();
+            RectF rectF = new RectF(MARGIN, MARGIN, bounds.right - MARGIN, bounds.bottom - MARGIN);
+            canvas.drawRoundRect(rectF, 15, 15, paint);
+        }
+
+        public void setRunning(boolean running) {
+            this.running = running;
+        }
+
+        public void setSurfaceSize(int width, int height) {
+            synchronized (surfaceHolder) {
+                this.surfaceWidth = width;
+                this.surfaceHeight = height;
+            }
+        }
+    }
 
 
     private Context context;
@@ -44,15 +104,28 @@ public class Sample3View extends SurfaceView implements SurfaceHolder.Callback {
         this.thread = new SurfaceThread(context, holder);
     }
 
-    public void surfaceCreated(SurfaceHolder surfaceHolder) {
-
+    public void surfaceChanged(SurfaceHolder surfaceHolder, int format, int width, int height) {
+        Log.d(TAG, "surfaceChanged");
+        thread.setSurfaceSize(width, height);
     }
 
-    public void surfaceChanged(SurfaceHolder surfaceHolder, int format, int width, int height) {
-
+    public void surfaceCreated(SurfaceHolder surfaceHolder) {
+        Log.d(TAG, "surfaceCreated");
+        thread.setRunning(true);
+        thread.start();
     }
 
     public void surfaceDestroyed(SurfaceHolder surfaceHolder) {
-
+        Log.d(TAG, "surfaceDestroyed");
+        boolean retry = true;
+        thread.setRunning(false);
+        while (retry) {
+            try {
+                thread.join();
+                retry = false;
+            } catch (InterruptedException e) {
+                // nothing
+            }
+        }
     }
 }
