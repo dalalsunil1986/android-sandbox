@@ -93,7 +93,7 @@ public class Sample3View extends SurfaceView implements SurfaceHolder.Callback {
             if (position == null) {
                 position = new PointF(bounds.centerX(), bounds.centerY());
                 velocity = PHYS_VELOCITY_START;
-                degree = (-1d / 4d) * Math.PI;
+                degree = (7 / 4d) * Math.PI;
                 return;
             }
 
