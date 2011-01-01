@@ -31,6 +31,12 @@ public class Sample3View extends SurfaceView implements SurfaceHolder.Callback {
         private int surfaceWidth;
         private int surfaceHeight;
 
+        private RectF bounds;
+
+        private PointF position;
+
+        
+
 
         SurfaceThread(Context context, SurfaceHolder surfaceHolder) {
             super();
@@ -58,12 +64,31 @@ public class Sample3View extends SurfaceView implements SurfaceHolder.Callback {
         }
 
         private void updatePhysics() {
-            // TODO
+            // use center as starting position
+            if (position == null) {
+                float x = bounds.centerX();
+                float y = bounds.centerY();
+                position = new PointF(x, y);
+            }
+
+
         }
 
         private void doDraw(Canvas canvas) {
             clearScreen(canvas);
             drawBackground(canvas);
+            drawBall(canvas);
+        }
+
+        private void drawBall(Canvas canvas) {
+            Paint paint = new Paint(Paint.ANTI_ALIAS_FLAG);      // TODO extract field
+            paint.setColor(GREEN);
+            paint.setStyle(Paint.Style.STROKE);
+            paint.setStrokeWidth(STROKE_WIDTH);
+
+            Path circle = new Path();
+            circle.addCircle(position.x, position.y, CIRCLE_RADIUS, Path.Direction.CW);
+            canvas.drawPath(circle, paint);
         }
 
         private void clearScreen(Canvas canvas) {
@@ -87,8 +112,16 @@ public class Sample3View extends SurfaceView implements SurfaceHolder.Callback {
 
         public void setSurfaceSize(int width, int height) {
             synchronized (surfaceHolder) {
+                // size
                 this.surfaceWidth = width;
                 this.surfaceHeight = height;
+
+                // bounds
+                float left = MARGIN + STROKE_WIDTH + CIRCLE_RADIUS;
+                float top = MARGIN + STROKE_WIDTH + CIRCLE_RADIUS;
+                float right = surfaceWidth - MARGIN - STROKE_WIDTH - CIRCLE_RADIUS;
+                float bottom = surfaceHeight - MARGIN - STROKE_WIDTH - CIRCLE_RADIUS;
+                bounds = new RectF(left, top, right, bottom);
             }
         }
     }
