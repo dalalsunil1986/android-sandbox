@@ -23,8 +23,8 @@ public class Sample3View extends SurfaceView implements SurfaceHolder.Callback {
 
 
     class SurfaceThread extends Thread {
-        private static final float PHYS_VELOCITY_START = 100f;      // pixel per seconds
-        private static final float PHYS_VELOCITY_LOSS = 25f;        // per second
+        private static final double PHYS_VELOCITY_START = 100d;      // pixel per seconds
+        private static final double PHYS_VELOCITY_LOSS = 25d;        // per second
 
         private final Context context;
         private final SurfaceHolder surfaceHolder;
@@ -42,8 +42,8 @@ public class Sample3View extends SurfaceView implements SurfaceHolder.Callback {
 
         private long lastTimestamp;
 
-        private int degree;
-        private float velocity;
+        private double degree;
+        private double velocity;
 
 
         SurfaceThread(Context context, SurfaceHolder surfaceHolder) {
@@ -93,7 +93,7 @@ public class Sample3View extends SurfaceView implements SurfaceHolder.Callback {
             if (position == null) {
                 position = new PointF(bounds.centerX(), bounds.centerY());
                 velocity = PHYS_VELOCITY_START;
-                degree = 90;
+                degree = - Math.PI / 4;     // 45°
                 return;
             }
 
@@ -102,19 +102,19 @@ public class Sample3View extends SurfaceView implements SurfaceHolder.Callback {
                 return;
 
             // choke velocity until it reaches zero
-            float loss = (PHYS_VELOCITY_LOSS / 1000) * duration;
+            double loss = (PHYS_VELOCITY_LOSS / 1000d) * duration;
             velocity = velocity - loss;
             if (velocity <= 0) {
-                velocity = 0f;
+                velocity = 0d;
                 return;
             }
 
-            float r = (duration / 1000f) * velocity;
-            float x = (float) (r * Math.cos(degree));
-            float y = (float) (r * Math.sin(degree));
+            double r = (duration / 1000d) * velocity;
+            double x = r * Math.cos(degree);
+            double y = r * Math.sin(degree);
 
-            float nextX = position.x + x;
-            float nextY = position.y + y;
+            float nextX = (float) (position.x + x);
+            float nextY = (float) (position.y + y);
             position = new PointF(nextX, nextY);
 
 
