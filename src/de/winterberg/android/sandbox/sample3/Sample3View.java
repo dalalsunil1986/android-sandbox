@@ -23,7 +23,7 @@ public class Sample3View extends SurfaceView implements SurfaceHolder.Callback {
 
 
     class SurfaceThread extends Thread {
-        private static final double PHYS_VELOCITY_START = 100d;      // pixel per seconds
+        private static final double PHYS_VELOCITY_START = 200d;      // pixel per seconds
         private static final double PHYS_VELOCITY_LOSS = 25d;        // per second
 
         private final Context context;
@@ -93,7 +93,7 @@ public class Sample3View extends SurfaceView implements SurfaceHolder.Callback {
             if (position == null) {
                 position = new PointF(bounds.centerX(), bounds.centerY());
                 velocity = PHYS_VELOCITY_START;
-                degree = - Math.PI / 4;     // 45°
+                degree = (-1d / 4d) * Math.PI;
                 return;
             }
 
@@ -109,15 +109,39 @@ public class Sample3View extends SurfaceView implements SurfaceHolder.Callback {
                 return;
             }
 
-            double r = (duration / 1000d) * velocity;
-            double x = r * Math.cos(degree);
-            double y = r * Math.sin(degree);
+            double distance = (duration / 1000d) * velocity;
 
-            float nextX = (float) (position.x + x);
-            float nextY = (float) (position.y + y);
-            position = new PointF(nextX, nextY);
+            
 
+            // calculate distance to bounds
+            double xBounds = bounds.right - position.x;
+            double distanceToBounds = xBounds / Math.cos(degree);
 
+//            Log.d(TAG, "distance="+ distance + "; distanceToBounds=" + distanceToBounds);
+
+            // enough distance to bounds
+            if (distanceToBounds > distance) {
+                float x = (float) (distance * Math.cos(degree));
+                float y = (float) (distance * Math.sin(degree));
+                position = new PointF(position.x + x, position.y + y);
+                return;
+            }
+
+            // distance to bounds is to small
+            // calculate bouncing
+//            distance -= distanceToBounds;
+//            degree += 2 * Math.PI;
+//            degree = -degree;
+
+//            float x = (float) (distance * Math.cos(degree));
+//            float y = (float) (distance * Math.sin(degree));
+//
+//            double yBounds = Math.sqrt(xBounds * xBounds - distanceToBounds * distanceToBounds);
+//            double xCollision = position.x + xBounds;
+//            double yCollision = position.y + yBounds;
+//            PointF collisionPoint = new PointF((float) xCollision, (float) yCollision);
+//
+//            position = new PointF(collisionPoint.x + x, collisionPoint.y + y);
         }
 
         private void doDraw(Canvas canvas) {
