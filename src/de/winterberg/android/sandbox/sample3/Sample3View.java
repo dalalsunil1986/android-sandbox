@@ -23,8 +23,14 @@ public class Sample3View extends SurfaceView implements SurfaceHolder.Callback {
 
 
     class SurfaceThread extends Thread {
+        private static final float PHYS_VELOCITY_START = 100f;      // pixel per seconds
+        private static final float PHYS_VELOCITY_LOSS = 25f;        // per second
+
         private final Context context;
         private final SurfaceHolder surfaceHolder;
+
+        private Paint boundsPaint;
+        private Paint ballPaint;
 
         private boolean running = false;
 
@@ -32,16 +38,31 @@ public class Sample3View extends SurfaceView implements SurfaceHolder.Callback {
         private int surfaceHeight;
 
         private RectF bounds;
-
         private PointF position;
 
-        
+        private long lastTimestamp;
+
+        private int degree;
+        private float velocity;
 
 
         SurfaceThread(Context context, SurfaceHolder surfaceHolder) {
             super();
             this.context = context;
             this.surfaceHolder = surfaceHolder;
+            initPaints();
+        }
+
+        private void initPaints() {
+            boundsPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
+            boundsPaint.setColor(BLUE);
+            boundsPaint.setStyle(Paint.Style.STROKE);
+            boundsPaint.setStrokeWidth(STROKE_WIDTH);
+
+            ballPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
+            ballPaint.setColor(GREEN);
+            ballPaint.setStyle(Paint.Style.STROKE);
+            ballPaint.setStrokeWidth(STROKE_WIDTH);
         }
 
         @Override
@@ -64,12 +85,37 @@ public class Sample3View extends SurfaceView implements SurfaceHolder.Callback {
         }
 
         private void updatePhysics() {
+            long now = System.currentTimeMillis();
+            long duration = now - lastTimestamp;
+            lastTimestamp = now;
+
             // use center as starting position
             if (position == null) {
-                float x = bounds.centerX();
-                float y = bounds.centerY();
-                position = new PointF(x, y);
+                position = new PointF(bounds.centerX(), bounds.centerY());
+                velocity = PHYS_VELOCITY_START;
+                degree = 90;
+                return;
             }
+
+            // do nothing without velocity
+            if (velocity == 0f)
+                return;
+
+            // choke velocity until it reaches zero
+            float loss = (PHYS_VELOCITY_LOSS / 1000) * duration;
+            velocity = velocity - loss;
+            if (velocity <= 0) {
+                velocity = 0f;
+                return;
+            }
+
+            float r = (duration / 1000f) * velocity;
+            float x = (float) (r * Math.cos(degree));
+            float y = (float) (r * Math.sin(degree));
+
+            float nextX = position.x + x;
+            float nextY = position.y + y;
+            position = new PointF(nextX, nextY);
 
 
         }
@@ -81,14 +127,9 @@ public class Sample3View extends SurfaceView implements SurfaceHolder.Callback {
         }
 
         private void drawBall(Canvas canvas) {
-            Paint paint = new Paint(Paint.ANTI_ALIAS_FLAG);      // TODO extract field
-            paint.setColor(GREEN);
-            paint.setStyle(Paint.Style.STROKE);
-            paint.setStrokeWidth(STROKE_WIDTH);
-
             Path circle = new Path();
             circle.addCircle(position.x, position.y, CIRCLE_RADIUS, Path.Direction.CW);
-            canvas.drawPath(circle, paint);
+            canvas.drawPath(circle, ballPaint);
         }
 
         private void clearScreen(Canvas canvas) {
@@ -96,14 +137,9 @@ public class Sample3View extends SurfaceView implements SurfaceHolder.Callback {
         }
 
         private void drawBackground(Canvas canvas) {
-            Paint paint = new Paint(Paint.ANTI_ALIAS_FLAG);     // TODO extract field
-            paint.setColor(BLUE);
-            paint.setStyle(Paint.Style.STROKE);
-            paint.setStrokeWidth(STROKE_WIDTH);
-
             Rect bounds = canvas.getClipBounds();
             RectF rectF = new RectF(MARGIN, MARGIN, bounds.right - MARGIN, bounds.bottom - MARGIN);
-            canvas.drawRoundRect(rectF, 15, 15, paint);
+            canvas.drawRoundRect(rectF, 15, 15, boundsPaint);
         }
 
         public void setRunning(boolean running) {
