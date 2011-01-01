@@ -62,11 +62,16 @@ public class Sample3View extends SurfaceView implements SurfaceHolder.Callback {
         }
 
         private void doDraw(Canvas canvas) {
+            clearScreen(canvas);
             drawBackground(canvas);
         }
 
+        private void clearScreen(Canvas canvas) {
+            canvas.drawColor(Color.BLACK);
+        }
+
         private void drawBackground(Canvas canvas) {
-            Paint paint = new Paint(Paint.ANTI_ALIAS_FLAG);
+            Paint paint = new Paint(Paint.ANTI_ALIAS_FLAG);     // TODO extract field
             paint.setColor(BLUE);
             paint.setStyle(Paint.Style.STROKE);
             paint.setStrokeWidth(STROKE_WIDTH);
