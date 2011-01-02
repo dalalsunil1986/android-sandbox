@@ -111,21 +111,42 @@ public class Sample3View extends SurfaceView implements SurfaceHolder.Callback {
 
             double distance = (duration / 1000d) * velocity;
 
-            
+            Log.d(TAG, "distance=" + distance);
 
-            // calculate distance to bounds
-            double xBounds = bounds.right - position.x;
-            double distanceToBounds = xBounds / Math.cos(degree);
+            // calculate possible collision with bounds
+            double dx = distance * Math.cos(degree);
+            double dy = distance * Math.sin(degree);
+            PointF collision = collision(dx, dy);
 
-//            Log.d(TAG, "distance="+ distance + "; distanceToBounds=" + distanceToBounds);
-
-            // enough distance to bounds
-            if (distanceToBounds > distance) {
-                float x = (float) (distance * Math.cos(degree));
-                float y = (float) (distance * Math.sin(degree));
-                position = new PointF(position.x + x, position.y + y);
+            if (collision == null) {
+                position = new PointF(position.x + (float) dx, position.y + (float) dy);
                 return;
             }
+
+            Log.d(TAG, "COLLISION: x=" + collision.x + "; y=" + collision.y);
+
+            // prevent collision
+            position = collision;
+
+            Path path = new Path();
+            path.addRect(bounds, Path.Direction.CW);
+
+
+
+
+            // calculate distance to bounds
+//            double xBounds = bounds.right - position.x;
+//            double distanceToBounds = xBounds / Math.cos(degree);
+//
+////            Log.d(TAG, "distance="+ distance + "; distanceToBounds=" + distanceToBounds);
+//
+//            // enough distance to bounds
+//            if (distanceToBounds > distance) {
+//                float x = (float) (distance * Math.cos(degree));
+//                float y = (float) (distance * Math.sin(degree));
+//                position = new PointF(position.x + x, position.y + y);
+//                return;
+//            }
 
             // distance to bounds is to small
             // calculate bouncing
@@ -142,6 +163,51 @@ public class Sample3View extends SurfaceView implements SurfaceHolder.Callback {
 //            PointF collisionPoint = new PointF((float) xCollision, (float) yCollision);
 //
 //            position = new PointF(collisionPoint.x + x, collisionPoint.y + y);
+        }
+
+        private PointF collision(double dx, double dy) {
+            double x1 = position.x;
+            double y1 = position.y;
+            double x2 = x1 + dx;
+            double y2 = y1 - dy;
+
+
+            // f(x) = m*x + t
+            double m = dy / dx;
+            double t = y1 / (m * x1);
+
+            double x, y;
+
+            // left
+            x = MARGIN;
+            y = m * x + t;
+            if (between(x, x1, x2) && between(y, y1, y2))
+                return new PointF((float) x, (float) y);
+
+            // right
+            x = bounds.width() + MARGIN + STROKE_WIDTH;
+            y = m * x + t;
+//            Log.d(TAG, "right: x=" + x + "; y=" + y);
+            if (between(x, x1, x2) && between(y, y1, y2))
+                return new PointF((float) x, (float) y);
+
+            // top
+            y = MARGIN;
+            x = (y - t) / m;
+            if (between(x, x1, x2) && between(y, y1, y2))
+                return new PointF((float) x, (float) y);
+
+            // bottom
+            y = bounds.height() + MARGIN;
+            x = (y - t) / m;
+            if (between(x, x1, x2) && between(y, y1, y2))
+                return new PointF((float) x, (float) y);
+
+            return null;
+        }
+
+        private boolean between(double a, double a1, double a2) {
+            return (a >= a1 && a <= a2) || (a >= a2 && a <= a1);
         }
 
         private void doDraw(Canvas canvas) {
