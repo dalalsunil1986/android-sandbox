@@ -8,6 +8,7 @@ import android.widget.Toast;
 import de.winterberg.android.sandbox.sample1.Sample1Activity;
 import de.winterberg.android.sandbox.sample2.Sample2Activity;
 import de.winterberg.android.sandbox.sample3.Sample3Activity;
+import de.winterberg.android.sandbox.sample4.Sample4Activity;
 
 /**
  * @author Benjamin Winterberg
@@ -18,7 +19,7 @@ public class MainActivity extends Activity {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.main);
-        startSample(3);
+        startSample(4);
     }
 
     public void onButtonClick(View view) {
@@ -31,6 +32,9 @@ public class MainActivity extends Activity {
                 break;
             case R.id.sample3_button:
                 startSample(3);
+                break;
+            case R.id.sample4_button:
+                startSample(4);
                 break;
         }
     }
@@ -45,6 +49,9 @@ public class MainActivity extends Activity {
                 break;
             case 3:
                 startActivity(new Intent(this, Sample3Activity.class));
+                break;
+            case 4:
+                startActivity(new Intent(this, Sample4Activity.class));
                 break;
             default:
                 Toast.makeText(this, "Sample not found " + num, Toast.LENGTH_LONG).show();

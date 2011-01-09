@@ -24,5 +24,8 @@
         <activity android:name=".sample3.Sample3Activity"
                   android:theme="@android:style/Theme.Black.NoTitleBar.Fullscreen"
                   android:screenOrientation="portrait" />
+        <activity android:name=".sample4.Sample4Activity"
+                  android:theme="@android:style/Theme.Black.NoTitleBar.Fullscreen"
+                  android:screenOrientation="portrait" />
     </application>
 </manifest>
