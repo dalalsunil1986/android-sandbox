@@ -2,6 +2,7 @@ package de.winterberg.android.sandbox.sample4;
 
 import android.content.Context;
 import android.graphics.*;
+import android.view.MotionEvent;
 import android.view.View;
 
 /**
@@ -11,20 +12,20 @@ public class Sample4View extends View {
 
     private Paint defaultPaint;
 
-    private PointF a;
-    private PointF b;
-    private PointF c;
-    private PointF d;
-    private PointF e;
+    private Matrix defaultTransform;
 
     private Path path;
 
 
     public Sample4View(Context context) {
         super(context);
-        initPaints();
+        init();
         resetModel();
-        transformModel();
+    }
+
+    @Override
+    public boolean onTouchEvent(MotionEvent ev) {
+        return true;
     }
 
     @Override
@@ -32,28 +33,12 @@ public class Sample4View extends View {
         canvas.drawPath(path, defaultPaint);
     }
 
-    private void transformModel() {
-        Matrix m;
-
-        m = new Matrix();
-        m.setRotate(180);
-        path.transform(m);
-
-        m = new Matrix();
-        m.setScale(2, 2);
-        path.transform(m);
-
-        m = new Matrix();
-        m.setTranslate(150, 200);
-        path.transform(m);
-    }
-
     private void resetModel() {
-        a = new PointF(-20f, -15f);
-        b = new PointF(20f, -15f);
-        c = new PointF(20f, 15f);
-        d = new PointF(-20f, 15f);
-        e = new PointF(0f, 35f);
+        PointF a = new PointF(-20f, -15f);
+        PointF b = new PointF(20f, -15f);
+        PointF c = new PointF(20f, 15f);
+        PointF d = new PointF(-20f, 15f);
+        PointF e = new PointF(0f, 35f);
 
         path = new Path();
         path.moveTo(a.x, a.y);
@@ -64,9 +49,16 @@ public class Sample4View extends View {
         path.lineTo(c.x, c.y);
         path.moveTo(d.x, d.y);
         path.lineTo(a.x, a.y);
+
+        path.transform(defaultTransform);
     }
 
-    private void initPaints() {
+    private void init() {
+        defaultTransform = new Matrix();
+        defaultTransform.setScale(2f, 2f);
+        defaultTransform.preRotate(180f);
+        defaultTransform.postTranslate(150f, 200f);
+
         defaultPaint = new Paint();
         defaultPaint.setColor(Color.rgb(0xff, 0xff, 0xff));
         defaultPaint.setAntiAlias(true);
