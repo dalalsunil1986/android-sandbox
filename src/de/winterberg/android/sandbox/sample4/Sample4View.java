@@ -2,6 +2,7 @@ package de.winterberg.android.sandbox.sample4;
 
 import android.content.Context;
 import android.graphics.*;
+import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 
@@ -9,12 +10,23 @@ import android.view.View;
  * @author Benjamin Winterberg
  */
 public class Sample4View extends View {
+    private static final String TAG = "Sample4";
+
+    private static final int MODE_NONE = 0x00;
+    private static final int MODE_DRAG = 0x01;
+    private static final int MODE_ZOOM = 0x02;
+    private static final int MODE_ROTATE = 0x02;
 
     private Paint defaultPaint;
+    private Paint dragPaint;
 
     private Matrix defaultTransform;
 
     private Path path;
+
+    private int mode;
+
+    private PointF start = new PointF();
 
 
     public Sample4View(Context context) {
@@ -25,12 +37,48 @@ public class Sample4View extends View {
 
     @Override
     public boolean onTouchEvent(MotionEvent ev) {
+        switch (ev.getAction() & MotionEvent.ACTION_MASK) {
+            case MotionEvent.ACTION_DOWN:
+                onDragStart(ev);
+                break;
+            case MotionEvent.ACTION_UP:
+            case MotionEvent.ACTION_POINTER_DOWN:
+                onDragEnd(ev);
+                break;
+            case MotionEvent.ACTION_MOVE:
+                onDrag(ev);
+                break;
+        }
         return true;
+    }
+
+    private void onDrag(MotionEvent ev) {
+        // TODO
+    }
+
+    private void onDragStart(MotionEvent ev) {
+        Log.d(TAG, "mode=DRAG");
+        mode = MODE_DRAG;
+        start.set(ev.getX(), ev.getY());
+    }
+
+    private void onDragEnd(MotionEvent ev) {
+        Log.d(TAG, "mode=NONE");
+        mode = MODE_NONE;
     }
 
     @Override
     protected void onDraw(Canvas canvas) {
-        canvas.drawPath(path, defaultPaint);
+        canvas.drawPath(path, getPaintByMode());
+    }
+
+    private Paint getPaintByMode() {
+        switch (mode) {
+            case MODE_DRAG:
+                return dragPaint;
+            default:
+                return defaultPaint;
+        }
     }
 
     private void resetModel() {
@@ -54,6 +102,8 @@ public class Sample4View extends View {
     }
 
     private void init() {
+        mode = MODE_NONE;
+
         defaultTransform = new Matrix();
         defaultTransform.setScale(2f, 2f);
         defaultTransform.preRotate(180f);
@@ -66,5 +116,8 @@ public class Sample4View extends View {
         defaultPaint.setStrokeCap(Paint.Cap.ROUND);
         defaultPaint.setStrokeJoin(Paint.Join.ROUND);
         defaultPaint.setStrokeWidth(2.5f);
+
+        dragPaint = new Paint(defaultPaint);
+        dragPaint.setColor(Color.rgb(0xff, 0x00, 0x00));
     }
 }
