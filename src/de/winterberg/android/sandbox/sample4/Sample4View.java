@@ -20,13 +20,19 @@ public class Sample4View extends View {
     private Paint defaultPaint;
     private Paint dragPaint;
 
-    private Matrix defaultTransform;
-
     private Path path;
+    private RectF bounds = new RectF();
+
+
+    // gesture stuff
 
     private int mode;
 
     private PointF start = new PointF();
+
+    private Matrix defaultMatrix;
+    private Matrix startMatrix;
+    private Matrix matrix;
 
 
     public Sample4View(Context context) {
@@ -39,32 +45,53 @@ public class Sample4View extends View {
     public boolean onTouchEvent(MotionEvent ev) {
         switch (ev.getAction() & MotionEvent.ACTION_MASK) {
             case MotionEvent.ACTION_DOWN:
-                onDragStart(ev);
+                if (mode == MODE_NONE)
+                    onDragStart(ev);
                 break;
             case MotionEvent.ACTION_UP:
             case MotionEvent.ACTION_POINTER_DOWN:
-                onDragEnd(ev);
+                if (mode == MODE_DRAG)
+                    onDragEnd(ev);
                 break;
             case MotionEvent.ACTION_MOVE:
-                onDrag(ev);
+                if (mode == MODE_DRAG)
+                    onDrag(ev);
                 break;
         }
         return true;
     }
 
     private void onDrag(MotionEvent ev) {
-        // TODO
+        float dx = ev.getX() - start.x;
+        float dy = ev.getY() - start.y;
+
+        Log.d(TAG, "MOVING > dx=" + dx + "; dy=" + dy);
+
+//        matrix.set(startMatrix);
+        matrix.postTranslate(dx, dy);
+        start.set(ev.getX(), ev.getY());
+
+        path.transform(matrix);
+        invalidate();
     }
 
     private void onDragStart(MotionEvent ev) {
-        Log.d(TAG, "mode=DRAG");
-        mode = MODE_DRAG;
-        start.set(ev.getX(), ev.getY());
+        float x = ev.getX();
+        float y = ev.getY();
+        if (computedBounds().contains(x, y)) {
+            Log.d(TAG, "mode=DRAG");
+            start.set(x, y);
+            startMatrix.set(matrix);
+            mode = MODE_DRAG;
+        }
     }
 
     private void onDragEnd(MotionEvent ev) {
-        Log.d(TAG, "mode=NONE");
+        startMatrix.set(null);
+        matrix.set(null);
         mode = MODE_NONE;
+        Log.d(TAG, "mode=NONE");
+        invalidate();
     }
 
     @Override
@@ -79,6 +106,11 @@ public class Sample4View extends View {
             default:
                 return defaultPaint;
         }
+    }
+
+    private RectF computedBounds() {
+        path.computeBounds(bounds, true);
+        return bounds;
     }
 
     private void resetModel() {
@@ -98,16 +130,19 @@ public class Sample4View extends View {
         path.moveTo(d.x, d.y);
         path.lineTo(a.x, a.y);
 
-        path.transform(defaultTransform);
+        path.transform(defaultMatrix);
     }
 
     private void init() {
         mode = MODE_NONE;
 
-        defaultTransform = new Matrix();
-        defaultTransform.setScale(2f, 2f);
-        defaultTransform.preRotate(180f);
-        defaultTransform.postTranslate(150f, 200f);
+        defaultMatrix = new Matrix();
+        defaultMatrix.setScale(2f, 2f);
+        defaultMatrix.preRotate(180f);
+        defaultMatrix.postTranslate(150f, 200f);
+
+        matrix = new Matrix();
+        startMatrix = new Matrix();
 
         defaultPaint = new Paint();
         defaultPaint.setColor(Color.rgb(0xff, 0xff, 0xff));
