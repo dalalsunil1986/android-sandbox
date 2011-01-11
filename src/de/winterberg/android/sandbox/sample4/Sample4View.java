@@ -26,13 +26,12 @@ public class Sample4View extends View {
 
     // gesture stuff
 
-    private int mode;
-
-    private PointF start = new PointF();
+    private int mode = MODE_NONE;
 
     private Matrix defaultMatrix;
-    private Matrix startMatrix;
-    private Matrix matrix;
+    private Matrix matrix = new Matrix();
+
+    private PointF drag = new PointF();
 
 
     public Sample4View(Context context) {
@@ -62,15 +61,10 @@ public class Sample4View extends View {
     }
 
     private void onDrag(MotionEvent ev) {
-        float dx = ev.getX() - start.x;
-        float dy = ev.getY() - start.y;
-
-        Log.d(TAG, "MOVING > dx=" + dx + "; dy=" + dy);
-
-//        matrix.set(startMatrix);
-        matrix.postTranslate(dx, dy);
-        start.set(ev.getX(), ev.getY());
-
+        float dx = ev.getX() - drag.x;
+        float dy = ev.getY() - drag.y;
+        matrix.setTranslate(dx, dy);
+        drag.set(ev.getX(), ev.getY());    // relevant for next drag
         path.transform(matrix);
         invalidate();
     }
@@ -80,14 +74,12 @@ public class Sample4View extends View {
         float y = ev.getY();
         if (computedBounds().contains(x, y)) {
             Log.d(TAG, "mode=DRAG");
-            start.set(x, y);
-            startMatrix.set(matrix);
+            drag.set(x, y);
             mode = MODE_DRAG;
         }
     }
 
     private void onDragEnd(MotionEvent ev) {
-        startMatrix.set(null);
         matrix.set(null);
         mode = MODE_NONE;
         Log.d(TAG, "mode=NONE");
@@ -134,15 +126,10 @@ public class Sample4View extends View {
     }
 
     private void init() {
-        mode = MODE_NONE;
-
         defaultMatrix = new Matrix();
         defaultMatrix.setScale(2f, 2f);
         defaultMatrix.preRotate(180f);
         defaultMatrix.postTranslate(150f, 200f);
-
-        matrix = new Matrix();
-        startMatrix = new Matrix();
 
         defaultPaint = new Paint();
         defaultPaint.setColor(Color.rgb(0xff, 0xff, 0xff));
