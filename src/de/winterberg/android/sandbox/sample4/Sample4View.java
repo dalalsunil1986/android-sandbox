@@ -84,7 +84,8 @@ public class Sample4View extends View {
             float scale = oldDistance / newDistance;
             matrix.setScale(scale, scale, zoomPivot.x, zoomPivot.y);
             path.transform(matrix);
-            invalidate();
+            RectF bounds = computedBounds();
+            invalidate((int)bounds.left, (int)bounds.top, (int)bounds.right, (int)bounds.bottom);
         }
         invalidate();
     }
