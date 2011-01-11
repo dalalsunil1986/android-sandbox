@@ -2,7 +2,7 @@
 <resources>
     <string name="app_name">Graphics Sandbox</string>
     <string name="sample1_label">Rotating Circle</string>
-    <string name="sample2_label">Bouncing Ball</string>
-    <string name="sample3_label">Ball Physics</string>
+    <string name="sample2_label">Simple Animations</string>
+    <string name="sample3_label">Simple Ball Physics (broken)</string>
     <string name="sample4_label">Transformations</string>
 </resources>
