@@ -15,10 +15,11 @@ public class Sample4View extends View {
     private static final int MODE_NONE = 0x00;
     private static final int MODE_DRAG = 0x01;
     private static final int MODE_ZOOM = 0x02;
-    private static final int MODE_ROTATE = 0x02;
+    private static final int MODE_ROTATE = 0x03;
 
     private Paint defaultPaint;
     private Paint dragPaint;
+    private Paint zoomPaint;
 
     private Path path;
     private RectF bounds = new RectF();
@@ -47,17 +48,41 @@ public class Sample4View extends View {
                 if (mode == MODE_NONE)
                     onDragStart(ev);
                 break;
-            case MotionEvent.ACTION_UP:
             case MotionEvent.ACTION_POINTER_DOWN:
+                if (mode == MODE_NONE || mode == MODE_DRAG)
+                    onZoomStart(ev);
+                break;
+            case MotionEvent.ACTION_POINTER_UP:
+            case MotionEvent.ACTION_UP:
                 if (mode == MODE_DRAG)
                     onDragEnd(ev);
+                else if (mode == MODE_ZOOM)
+                    onZoomEnd(ev);
                 break;
             case MotionEvent.ACTION_MOVE:
                 if (mode == MODE_DRAG)
                     onDrag(ev);
+                else if (mode == MODE_ZOOM)
+                    onZoom(ev);
                 break;
         }
         return true;
+    }
+
+    private void onZoom(MotionEvent ev) {
+        // TODO
+        invalidate();
+    }
+
+    private void onZoomStart(MotionEvent ev) {
+        Log.d(TAG, "mode=ZOOM");
+        mode = MODE_ZOOM;
+    }
+
+    private void onZoomEnd(MotionEvent ev) {
+        Log.d(TAG, "mode=NONE");
+        mode = MODE_NONE;
+        invalidate();
     }
 
     private void onDrag(MotionEvent ev) {
@@ -95,6 +120,8 @@ public class Sample4View extends View {
         switch (mode) {
             case MODE_DRAG:
                 return dragPaint;
+            case MODE_ZOOM:
+                return zoomPaint;
             default:
                 return defaultPaint;
         }
@@ -141,5 +168,8 @@ public class Sample4View extends View {
 
         dragPaint = new Paint(defaultPaint);
         dragPaint.setColor(Color.rgb(0xff, 0x00, 0x00));
+
+        zoomPaint = new Paint(defaultPaint);
+        zoomPaint.setColor(Color.rgb(0x00, 0xff, 0x00));
     }
 }
