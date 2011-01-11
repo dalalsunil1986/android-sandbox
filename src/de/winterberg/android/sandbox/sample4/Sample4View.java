@@ -2,6 +2,7 @@ package de.winterberg.android.sandbox.sample4;
 
 import android.content.Context;
 import android.graphics.*;
+import android.util.FloatMath;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
@@ -33,6 +34,8 @@ public class Sample4View extends View {
     private Matrix matrix = new Matrix();
 
     private PointF drag = new PointF();
+    private PointF zoomPivot = new PointF();
+    private float oldDistance = 1.0f;
 
 
     public Sample4View(Context context) {
@@ -69,13 +72,28 @@ public class Sample4View extends View {
         return true;
     }
 
+    private float distance(MotionEvent ev) {
+        float x = ev.getX(0) + ev.getX(1);
+        float y = ev.getY(0) + ev.getY(1);
+        return FloatMath.sqrt(x * x + y * y);
+    }
+
     private void onZoom(MotionEvent ev) {
-        // TODO
+        float newDistance = distance(ev);
+        if (newDistance > 20f) {
+            float scale = oldDistance / newDistance;
+            matrix.setScale(scale, scale, zoomPivot.x, zoomPivot.y);
+            path.transform(matrix);
+            invalidate();
+        }
         invalidate();
     }
 
     private void onZoomStart(MotionEvent ev) {
         Log.d(TAG, "mode=ZOOM");
+        oldDistance = distance(ev);
+        RectF bounds = computedBounds();
+        zoomPivot.set(bounds.centerX(), bounds.centerY());
         mode = MODE_ZOOM;
     }
 
