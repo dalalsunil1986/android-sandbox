@@ -21,6 +21,7 @@ public class Sample4View extends View {
     private Paint defaultPaint;
     private Paint dragPaint;
     private Paint zoomPaint;
+    private Paint rotatePaint;
 
     private Path path;
     private RectF bounds = new RectF();
@@ -33,8 +34,8 @@ public class Sample4View extends View {
     private Matrix defaultMatrix;
     private Matrix matrix = new Matrix();
 
-    private PointF drag = new PointF();
-    private PointF zoomPivot = new PointF();
+    private PointF point = new PointF();
+    private PointF pivot = new PointF();
     private float oldDistance = 1.0f;
 
 
@@ -48,8 +49,16 @@ public class Sample4View extends View {
     public boolean onTouchEvent(MotionEvent ev) {
         switch (ev.getAction() & MotionEvent.ACTION_MASK) {
             case MotionEvent.ACTION_DOWN:
-                if (mode == MODE_NONE)
-                    onDragStart(ev);
+                if (mode == MODE_NONE) {
+                    float x = ev.getX();
+                    float y = ev.getY();
+                    RectF bounds = computedBounds();
+                    // TODO
+                    if (bounds.contains(x, y)) {
+                        onRotateStart(ev);
+//                        onDragStart(ev);
+                    }
+                }
                 break;
             case MotionEvent.ACTION_POINTER_DOWN:
                 if (mode == MODE_NONE || mode == MODE_DRAG)
@@ -61,15 +70,44 @@ public class Sample4View extends View {
                     onDragEnd(ev);
                 else if (mode == MODE_ZOOM)
                     onZoomEnd(ev);
+                else if (mode == MODE_ROTATE)
+                    onRotateEnd(ev);
                 break;
             case MotionEvent.ACTION_MOVE:
                 if (mode == MODE_DRAG)
                     onDrag(ev);
                 else if (mode == MODE_ZOOM)
                     onZoom(ev);
+                else if (mode == MODE_ROTATE)
+                    onRotate(ev);
                 break;
         }
         return true;
+    }
+
+    private void onRotate(MotionEvent ev) {
+        float dx = ev.getX() - point.x;
+        float dy = ev.getY() - point.y;
+        float distance = Math.abs(dx) > Math.abs(dy) ? dx : dy;
+        float degrees = 360 * (distance / 3600);
+        matrix.setRotate(degrees, pivot.x, pivot.y);
+        path.transform(matrix);
+        invalidate();
+    }
+
+    private void onRotateStart(MotionEvent ev) {
+        RectF bounds = computedBounds();
+        pivot.set(bounds.centerX(), bounds.centerY());
+        point.set(ev.getX(), ev.getY());
+        Log.d(TAG, "mode=ROTATE");
+        mode = MODE_ROTATE;
+    }
+
+    private void onRotateEnd(MotionEvent ev) {
+        matrix.set(null);
+        Log.d(TAG, "mode=NONE");
+        mode = MODE_NONE;
+        invalidate();
     }
 
     private float distance(MotionEvent ev) {
@@ -82,10 +120,10 @@ public class Sample4View extends View {
         float newDistance = distance(ev);
         if (newDistance > 20f) {
             float scale = oldDistance / newDistance;
-            matrix.setScale(scale, scale, zoomPivot.x, zoomPivot.y);
+            matrix.setScale(scale, scale, pivot.x, pivot.y);
             path.transform(matrix);
             RectF bounds = computedBounds();
-            invalidate((int)bounds.left, (int)bounds.top, (int)bounds.right, (int)bounds.bottom);
+            invalidate((int) bounds.left, (int) bounds.top, (int) bounds.right, (int) bounds.bottom);
         }
         invalidate();
     }
@@ -94,7 +132,7 @@ public class Sample4View extends View {
         Log.d(TAG, "mode=ZOOM");
         oldDistance = distance(ev);
         RectF bounds = computedBounds();
-        zoomPivot.set(bounds.centerX(), bounds.centerY());
+        pivot.set(bounds.centerX(), bounds.centerY());
         mode = MODE_ZOOM;
     }
 
@@ -105,22 +143,18 @@ public class Sample4View extends View {
     }
 
     private void onDrag(MotionEvent ev) {
-        float dx = ev.getX() - drag.x;
-        float dy = ev.getY() - drag.y;
+        float dx = ev.getX() - point.x;
+        float dy = ev.getY() - point.y;
         matrix.setTranslate(dx, dy);
-        drag.set(ev.getX(), ev.getY());    // relevant for next drag
+        point.set(ev.getX(), ev.getY());    // relevant for next drag
         path.transform(matrix);
         invalidate();
     }
 
     private void onDragStart(MotionEvent ev) {
-        float x = ev.getX();
-        float y = ev.getY();
-        if (computedBounds().contains(x, y)) {
-            Log.d(TAG, "mode=DRAG");
-            drag.set(x, y);
-            mode = MODE_DRAG;
-        }
+        point.set(ev.getX(), ev.getY());
+        Log.d(TAG, "mode=DRAG");
+        mode = MODE_DRAG;
     }
 
     private void onDragEnd(MotionEvent ev) {
@@ -141,6 +175,8 @@ public class Sample4View extends View {
                 return dragPaint;
             case MODE_ZOOM:
                 return zoomPaint;
+            case MODE_ROTATE:
+                return rotatePaint;
             default:
                 return defaultPaint;
         }
@@ -190,5 +226,8 @@ public class Sample4View extends View {
 
         zoomPaint = new Paint(defaultPaint);
         zoomPaint.setColor(Color.rgb(0x00, 0xff, 0x00));
+
+        rotatePaint = new Paint(defaultPaint);
+        rotatePaint.setColor(Color.rgb(0x00, 0x00, 0xff));
     }
 }
