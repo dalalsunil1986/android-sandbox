@@ -3,6 +3,7 @@
     <string name="app_name">Graphics Sandbox</string>
     <string name="sample1_label">Rotating Circle</string>
     <string name="sample2_label">Simple Animations</string>
-    <string name="sample3_label">Simple Ball Physics (broken)</string>
+    <string name="sample3_label">Simple Ball Physics</string>
     <string name="sample4_label">Transformations</string>
+    <string name="sample5_label">Collision Detection</string>
 </resources>
