@@ -19,7 +19,7 @@ public class MainActivity extends Activity {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.main);
-        startSample(4);
+//        startSample(4);
     }
 
     public void onButtonClick(View view) {

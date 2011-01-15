@@ -1,6 +1,7 @@
 package de.winterberg.android.sandbox.sample1;
 
 import android.app.Activity;
+import android.graphics.PixelFormat;
 import android.os.Bundle;
 
 /**
@@ -13,4 +14,9 @@ public class Sample1Activity extends Activity {
         setContentView(new Sample1View(this));
     }
 
+    @Override
+    public void onAttachedToWindow() {
+        super.onAttachedToWindow();
+        getWindow().setFormat(PixelFormat.RGBA_8888);
+    }
 }
