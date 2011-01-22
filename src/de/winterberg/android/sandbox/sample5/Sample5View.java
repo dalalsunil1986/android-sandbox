@@ -26,6 +26,7 @@ public class Sample5View extends View {
     private RectF rect = new RectF();
     private boolean dragging = false;
 
+
     public Sample5View(Context context) {
         super(context);
         initPaints();
@@ -45,7 +46,7 @@ public class Sample5View extends View {
                 break;
             case MotionEvent.ACTION_UP:
                 if (dragging)
-                    onDragEnd(ev);
+                    onDragEnd();
                 break;
         }
         return true;
@@ -55,7 +56,7 @@ public class Sample5View extends View {
         float dx = ev.getX() - point.x;
         float dy = ev.getY() - point.y;
         matrix.setTranslate(dx, dy);
-        point.set(ev.getX(), ev.getY());    // relevant for next drag
+        point.set(ev.getX(), ev.getY());
         dragElement.transform(matrix);
         invalidate();
     }
@@ -86,9 +87,10 @@ public class Sample5View extends View {
         }
     }
 
-    private void onDragEnd(MotionEvent ev) {
+    private void onDragEnd() {
         dragging = false;
         dragElement = null;
+        invalidate();
     }
 
     private void initPaths() {
@@ -105,7 +107,7 @@ public class Sample5View extends View {
         square.addRect(0, 0, 10, 10, Path.Direction.CW);
 
 
-        float sx = 7, sy = 7;
+        float sx = 8, sy = 8;
 
         Matrix matrix = new Matrix();
 
