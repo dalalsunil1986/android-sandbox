@@ -2,6 +2,7 @@ package de.winterberg.android.sandbox.sample5;
 
 import android.content.Context;
 import android.graphics.*;
+import android.view.MotionEvent;
 import android.view.View;
 
 /**
@@ -19,11 +20,75 @@ public class Sample5View extends View {
     private Path triangle;
     private Path square;
 
+    private Path dragElement;
+    private Matrix matrix = new Matrix();
+    private PointF point = new PointF();
+    private RectF rect = new RectF();
+    private boolean dragging = false;
 
     public Sample5View(Context context) {
         super(context);
         initPaints();
         initPaths();
+    }
+
+    @Override
+    public boolean onTouchEvent(MotionEvent ev) {
+        switch (ev.getAction() & MotionEvent.ACTION_MASK) {
+            case MotionEvent.ACTION_DOWN:
+                if (!dragging)
+                    onDragStart(ev);
+                break;
+            case MotionEvent.ACTION_MOVE:
+                if (dragging)
+                    onDrag(ev);
+                break;
+            case MotionEvent.ACTION_UP:
+                if (dragging)
+                    onDragEnd(ev);
+                break;
+        }
+        return true;
+    }
+
+    private void onDrag(MotionEvent ev) {
+        float dx = ev.getX() - point.x;
+        float dy = ev.getY() - point.y;
+        matrix.setTranslate(dx, dy);
+        point.set(ev.getX(), ev.getY());    // relevant for next drag
+        dragElement.transform(matrix);
+        invalidate();
+    }
+
+    private void onDragStart(MotionEvent ev) {
+        float x = ev.getX();
+        float y = ev.getY();
+        point.set(x, y);
+
+        circle.computeBounds(rect, true);
+        if (rect.contains(x, y)) {
+            dragging = true;
+            dragElement = circle;
+            return;
+        }
+
+        triangle.computeBounds(rect, true);
+        if (rect.contains(x, y)) {
+            dragging = true;
+            dragElement = triangle;
+            return;
+        }
+
+        square.computeBounds(rect, true);
+        if (rect.contains(x, y)) {
+            dragging = true;
+            dragElement = square;
+        }
+    }
+
+    private void onDragEnd(MotionEvent ev) {
+        dragging = false;
+        dragElement = null;
     }
 
     private void initPaths() {
@@ -62,6 +127,7 @@ public class Sample5View extends View {
 
     private void initPaints() {
         normalPaint = new Paint();
+        normalPaint.setAntiAlias(true);
         normalPaint.setColor(Color.WHITE);
         normalPaint.setStyle(Paint.Style.STROKE);
         normalPaint.setStrokeCap(Paint.Cap.ROUND);
