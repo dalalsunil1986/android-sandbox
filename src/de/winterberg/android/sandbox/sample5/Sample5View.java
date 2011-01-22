@@ -26,8 +26,8 @@ public class Sample5View extends View {
     private RectF rect = new RectF();
     private boolean dragging = false;
 
-    private Region region1 = new Region();
-    private Region region2 = new Region();
+    private Region dragRegion = new Region();
+    private Region targetRegion = new Region();
     private Region clipping = new Region();
 
     public Sample5View(Context context) {
@@ -40,10 +40,10 @@ public class Sample5View extends View {
         if (!dragging || dragElement == target)
             return false;
 
-        region1.setPath(dragElement, clipping);
-        region2.setPath(target, clipping);
+        dragRegion.setPath(dragElement, clipping);
+        targetRegion.setPath(target, clipping);
 
-        return region1.op(region2, Region.Op.INTERSECT);
+        return dragRegion.op(targetRegion, Region.Op.INTERSECT);
     }
 
     @Override
