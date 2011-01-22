@@ -26,11 +26,30 @@ public class Sample5View extends View {
     private RectF rect = new RectF();
     private boolean dragging = false;
 
+    private Region region1 = new Region();
+    private Region region2 = new Region();
+    private Region clipping = new Region();
 
     public Sample5View(Context context) {
         super(context);
         initPaints();
         initPaths();
+    }
+
+    private boolean collision(Path target) {
+        if (!dragging || dragElement == target)
+            return false;
+
+        region1.setPath(dragElement, clipping);
+        region2.setPath(target, clipping);
+
+        return region1.op(region2, Region.Op.INTERSECT);
+    }
+
+    @Override
+    protected void onSizeChanged(int w, int h, int oldw, int oldh) {
+        super.onSizeChanged(w, h, oldw, oldh);
+        clipping.set(0, 0, w, h);
     }
 
     @Override
@@ -140,10 +159,14 @@ public class Sample5View extends View {
         collisionPaint.setColor(Color.RED);
     }
 
+    private Paint getPaint(Path target) {
+        return collision(target) ? collisionPaint : normalPaint;
+    }
+
     @Override
     protected void onDraw(Canvas canvas) {
-        canvas.drawPath(circle, normalPaint);
-        canvas.drawPath(triangle, normalPaint);
-        canvas.drawPath(square, normalPaint);
+        canvas.drawPath(circle, getPaint(circle));
+        canvas.drawPath(triangle, getPaint(triangle));
+        canvas.drawPath(square, getPaint(square));
     }
 }
