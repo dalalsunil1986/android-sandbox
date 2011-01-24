@@ -30,5 +30,8 @@
         <activity android:name=".sample5.Sample5Activity"
                   android:theme="@android:style/Theme.Black.NoTitleBar.Fullscreen"
                   android:screenOrientation="portrait" />
+        <activity android:name=".sample6.Sample6Activity"
+                  android:theme="@android:style/Theme.Black.NoTitleBar.Fullscreen"
+                  android:screenOrientation="portrait" />
     </application>
 </manifest>

@@ -6,4 +6,5 @@
     <string name="sample3_label">Simple Ball Physics</string>
     <string name="sample4_label">Transformations</string>
     <string name="sample5_label">Collision Detection</string>
+    <string name="sample6_label">Text drawings</string>
 </resources>
